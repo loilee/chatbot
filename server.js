@@ -5,8 +5,9 @@ const bodyParser = require('body-parser');
 const config = require('./config');
 const FBeamer = require('./fbeamer');
 // Vanilla
+const matcher = require('./matcher');
 const weather = require('./weather');
-const {currentWeather, forecastWeather} = require('./parser');
+const {currentWeather, forecastWeather, getTemperature} = require('./parser');
 
 const server = express();
 const PORT = process.env.PORT || 3000;
@@ -21,27 +22,56 @@ server.post('/', (req, res, next) => {
   // we will pass the messages to FBeamer for parsing
   return f.incoming(req, res, data => {
     try {
-      // console.log(data);
       if(data.type === 'text') {
-        switch(data.content.intent) {
-          case 'greeting':
-            f.txt(data.sender, `Hello to you too!`);
-            break;
-          case 'weather':
-            f.txt(data.sender, 'I am smart and looking out the window...');
-            weather(data.content.location, 'current')
-              .then(response => {
-                let parseResult = currentWeather(data.content.location, response);
-                f.txt(data.sender, parseResult);
-              })
-              .catch(error => {
-                f.txt(data.sender, `Sorry, I can't get the weather for ${data.content.location.toUpperCase()}.`);
-              });
-            break;
-          default: {
-            f.txt(data.sender, "I don't know what you mean :(");
+        matcher(data.content, async resp => {
+          switch(resp.intent) {
+            case 'Hello':
+              await f.txt(data.sender, `${resp.entities.greeting} to you too!`);
+              break;
+            case 'CurrentWeather':
+              await f.txt(data.sender, 'Looking out the window...');
+              weather(resp.entities.city, 'current')
+      					.then(response => {
+      						let parseResult = currentWeather(resp.entities.city, response);
+                  f.txt(data.sender, parseResult);
+      					})
+      					.catch(error => {
+      						f.txt(data.sender, `Sorry, I can't get the weather for ${location.toUpperCase()}.`);
+      					});
+              break;
+            case 'WeatherForecast':
+              await f.txt(data.sender, 'Looking into my crystal ball...');
+              weather(resp.entities.city, 'forecast', resp.entities.time)
+      					.then(response => {
+      						let parseResult = forecastWeather(response.daily.data[0], resp.entities);
+                  f.txt(data.sender, parseResult);
+      					})
+      					.catch(error => {
+      						f.txt(data.sender, "Sorry, not clear the future is.");
+      						rl.prompt();
+      					});
+              break;
+            case 'Temperature':
+                //console.log(`Getting the temperature in ${data.entities.city} ...`)
+                await f.txt(data.sender, `Getting the temperature in ${resp.entities.city} ...`);
+                weather(resp.entities.city, 'current')
+                .then(response => {
+                  let parseResult = getTemperature(resp.entities.city, response);
+                  f.txt(data.sender, parseResult);
+                })
+                .catch(error => {
+                  f.txt(data.sender, "Are you sure the city is correct?");
+                  rl.prompt();
+                });
+                break;
+            case 'Exit':
+              await f.txt(data.sender, "Have a nice day! :D");
+              break;
+            default: {
+              await f.txt(data.sender, "I don't know what you mean :(");
+            }
           }
-        }
+        });
       }
     } catch(e) {
       console.log(e);
