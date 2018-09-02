@@ -6,7 +6,7 @@ const config = require('./config');
 const FBeamer = require('./fbeamer');
 // Vanilla
 const weather = require('./weather');
-const {currentWeather, forecastWeather} = require('./parser');
+const {currentWeather, forecastWeather, currentTemperature} = require('./parser');
 
 const server = express();
 const PORT = process.env.PORT || 3000;
@@ -36,6 +36,17 @@ server.post('/', (req, res, next) => {
               })
               .catch(error => {
                 f.txt(data.sender, `Sorry, I can't get the weather for ${data.content.location}.`);
+              });
+            break;
+          case "temperature":
+            f.txt(data.sender, 'Temperate check....');
+            weather(data.content.location, 'current')
+              .then(response => {
+                let parseResult = currentTemperature(data.content.location, response);
+                f.txt(data.sender, parseResult);
+              })
+              .catch(error => {
+                f.txt(data.sender, `Sorry, I can't get the temperature for ${data.content.location}.`);
               });
             break;
           default: {
