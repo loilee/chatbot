@@ -39,7 +39,7 @@ server.post('/', (req, res, next) => {
               });
             break;
           case "temperature":
-            f.txt(data.sender, 'Temperate check....');
+            f.txt(data.sender, 'Checking temperature ...');
             weather(data.content.location, 'current')
               .then(response => {
                 let parseResult = currentTemperature(data.content.location, response);
