@@ -21,7 +21,7 @@ server.post('/', (req, res, next) => {
   // we will pass the messages to FBeamer for parsing
   return f.incoming(req, res, data => {
     try {
-      // console.log(data);
+      console.log(data);
       if(data.type === 'text') {
         switch(data.content.intent) {
           case 'greeting':
