@@ -18,9 +18,6 @@ let future = [{
 }, {
 	codes: ["cloudy"],
 	prefix: "it will be"
-}, {
-	pattern: 'temperature\\sin\\s\\b(?<city>.+)',
-	intent: 'Temperature'
 }];
 
 module.exports = {

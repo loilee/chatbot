@@ -78,14 +78,27 @@ class FBeamer {
   }
 
   messageHandler(obj) {
+    // console.log(obj.message.nlp.entities);
     let sender = obj.sender.id;
     let message = obj.message;
 
     if(message.text) {
+      var nlp;
+      if (message.nlp.entities.location) {
+        nlp = {
+          intent: message.nlp.entities.intent[0].value,
+          location: message.nlp.entities.location[0].value
+        }
+      } else {
+        nlp = {
+          intent: message.nlp.entities.intent[0].value
+        }
+      }
+
       let obj = {
         sender,
         type: 'text',
-        content: message.text
+        content: nlp
       }
 
       return obj;

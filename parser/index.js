@@ -49,18 +49,7 @@ let forecastWeather = (response, data) => {
 	}
 }
 
-
-let getTemperature = (location, response) => {
-	if (response.icon) {
-		let {icon, temperature} = response;
-		return `The temperature in ${location} is, ${temperature.toString()} degrees.`
-	} else {
-		return "I don't seem to know anything about this place...Sorry :(";
-	}
-}
-
 module.exports = {
 	currentWeather,
-	forecastWeather,
-	getTemperature
+	forecastWeather
 }
