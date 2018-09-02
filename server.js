@@ -35,7 +35,7 @@ server.post('/', (req, res, next) => {
                 f.txt(data.sender, parseResult);
               })
               .catch(error => {
-                f.txt(data.sender, `Sorry, I can't get the weather for ${data.content.location.toUpperCase()}.`);
+                f.txt(data.sender, `Sorry, I can't get the weather for ${data.content.location}.`);
               });
             break;
           default: {
